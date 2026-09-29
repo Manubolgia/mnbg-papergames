@@ -208,7 +208,6 @@ function showHome() {
       go(a.getAttribute('href'));
     }),
   );
-  $('#library')?.addEventListener('click', () => window.parent.postMessage({ type: 'mnbglibrary:eject' }, location.origin));
   const install = $('#install');
   if (installPrompt && !inLibrary) {
     install.hidden = false;
@@ -791,6 +790,20 @@ document.addEventListener('keydown', (e) => {
 // ---- start -------------------------------------------------------------------
 
 if (inLibrary) window.parent.postMessage({ type: 'mnbglibrary:hello', exit: true }, location.origin);
+
+// Back to the library: call the deck directly when it offers that (same
+// site), and send the message too, which is what older decks listen for.
+function backToLibrary() {
+  try {
+    if (typeof window.parent.mnbglibrary?.eject === 'function') return window.parent.mnbglibrary.eject();
+  } catch {}
+  window.parent.postMessage({ type: 'mnbglibrary:eject' }, location.origin);
+}
+
+// Caught on the document, so it works however often the home screen is drawn.
+document.addEventListener('click', (e) => {
+  if (inLibrary && e.target.closest('#library')) backToLibrary();
+});
 
 route();
 
