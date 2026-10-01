@@ -1,6 +1,7 @@
 // Paper Games: three pencil puzzles, each one made on the spot.
 //
 // Views: home (#), a game's page (#sudoku) and the board (#sudoku/play).
+// A link to one puzzle (#sudoku/hard/4211, #tectonic/easy-8/52) opens it.
 // Puzzles are made in a worker so the page never stalls; the game in
 // progress, settings and records live in localStorage.
 
@@ -78,6 +79,16 @@ function clock(sec) {
 const settingKey = (level, size) => (size ? `${level}-${size}` : level);
 const settingName = (level, size) => (size ? `${cap(level)} · ${size}×${size}` : cap(level));
 const number = (seed) => `No. ${String(seed).padStart(6, '0')}`;
+
+const MAX_SEED = 999999;
+
+// The number typed in, or null if it isn't one.
+function parseSeed(text) {
+  const digits = String(text).replace(/^\s*(no\.?)?\s*/i, '').trim();
+  if (!/^\d{1,6}$/.test(digits)) return null;
+  const n = Number(digits);
+  return n >= 1 && n <= MAX_SEED ? n : null;
+}
 
 function newSeed() {
   const a = new Uint32Array(1);
@@ -161,9 +172,10 @@ function makePuzzle(game, opts, seed) {
 // ---- routing ---------------------------------------------------------------
 
 function route() {
-  const [game, sub] = location.hash.slice(1).split('/');
+  const [game, sub, num] = location.hash.slice(1).split('/');
   stopClock();
   if (INFO[game] && sub === 'play') return showPlay(game);
+  if (INFO[game] && sub && num) return openShared(game, sub, num);
   if (INFO[game]) return showSetup(game);
   return showHome();
 }
@@ -257,6 +269,14 @@ function showSetup(game) {
       <button class="btn primary wide" id="new">New puzzle</button>
       ${save && !save.done ? `<button class="btn wide" id="continue">Continue<small>${number(save.seed)} · ${settingName(save.level, save.size)} · ${clock(save.time)}</small></button>` : ''}
     </div>
+    <form class="field number" id="by-number" novalidate>
+      <label class="label" for="seed">Puzzle number</label>
+      <div class="entry">
+        <input id="seed" inputmode="numeric" autocomplete="off" enterkeyhint="go" placeholder="000000" />
+        <button class="btn" type="submit">Open</button>
+      </div>
+      <p class="note">Someone's number opens the same puzzle at the same level${def.sizes ? ' and size' : ''}.</p>
+    </form>
     <dl class="stats">
       <dt>Solved</dt><dd>${stats.solved}</dd>
       <dt>Best, ${settingName(p.level, def.sizes ? p.size : null).toLowerCase()}</dt><dd>${best ? clock(best) : '—'}</dd>
@@ -278,6 +298,16 @@ function showSetup(game) {
   );
   $('#new').addEventListener('click', () => startNew(game));
   $('#continue')?.addEventListener('click', () => go(`#${game}/play`));
+  $('#by-number').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const seed = parseSeed($('#seed').value);
+    if (!seed) {
+      toast(`A number from 1 to ${MAX_SEED}`);
+      return $('#seed').focus();
+    }
+    const now = prefs(game);
+    openNumber(game, now.level, def.sizes ? now.size : null, seed);
+  });
 }
 
 async function startNew(game) {
@@ -285,6 +315,52 @@ async function startNew(game) {
   const size = GAMES[game].sizes ? p.size : null;
   store.saves[game] = { making: true, level: p.level, size, seed: newSeed() };
   go(`#${game}/play`);
+}
+
+// The same number at the same settings is the same puzzle on every device.
+// If it's the one already on the board, carry on with it.
+function openNumber(game, level, size, seed, replace = false) {
+  const s = store.saves[game];
+  const same = s && !s.done && s.seed === seed && s.level === level && (s.size || null) === size;
+  if (!same) store.saves[game] = { making: true, level, size, seed };
+  store.prefs[game] = { ...prefs(game), level, ...(size ? { size } : {}) };
+  persist();
+  go(`#${game}/play`, replace);
+}
+
+// A shared link: #sudoku/hard/4211 or #tectonic/easy-8/52.
+function openShared(game, setting, num) {
+  const def = GAMES[game];
+  const [level, sizeText] = setting.split('-');
+  const size = def.sizes ? Number(sizeText) : null;
+  const seed = parseSeed(num);
+  if (!def.levels.includes(level) || (def.sizes && !def.sizes.includes(size)) || !seed) {
+    toast('That puzzle link is not right');
+    return go(`#${game}`, true);
+  }
+  openNumber(game, level, size, seed, true);
+}
+
+const shareHash = (s) => `#${s.game}/${settingKey(s.level, s.size)}/${s.seed}`;
+
+async function share() {
+  if (!S) return;
+  const title = `${INFO[S.game].name} · ${settingName(S.level, S.size)} · ${number(S.seed)}`;
+  // Outside pages can't be linked into the library's frame, so the link
+  // points at the app on its own; the number works anywhere.
+  const url = location.href.split('#')[0] + shareHash(S);
+  const text = `${title} in Paper Games`;
+  try {
+    if (navigator.share && !inLibrary) return await navigator.share({ title, text, url });
+  } catch (err) {
+    if (err && err.name === 'AbortError') return;
+  }
+  try {
+    await navigator.clipboard.writeText(`${text}\n${url}`);
+    toast('Copied. Send it to a friend');
+  } catch {
+    toast(title);
+  }
 }
 
 // ---- playing ---------------------------------------------------------------
@@ -365,7 +441,7 @@ async function showPlay(game) {
   app.innerHTML = `
     <header class="bar">
       <a class="back" href="#${game}" aria-label="Back">←</a>
-      <div><h2>${info.name}</h2><span class="sub">${settingName(saved.level, saved.size)} · ${number(saved.seed)}</span></div>
+      <div><h2>${info.name}</h2><button type="button" class="sub share" aria-label="Share this puzzle">${settingName(saved.level, saved.size)} · ${number(saved.seed)} <span aria-hidden="true">↗</span></button></div>
       <span class="timer">00:00</span>
     </header>
     <div class="stage"><div class="board wait"><span class="making">Making puzzle</span></div></div>
@@ -375,6 +451,7 @@ async function showPlay(game) {
     save();
     go(`#${game}`, true);
   });
+  $('.share').addEventListener('click', share);
 
   if (saved.making) {
     try {

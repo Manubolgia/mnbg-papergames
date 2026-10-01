@@ -56,6 +56,12 @@ milliseconds.
 - Binairo: tap a cell to cycle full, empty, blank; or use the two keys.
 - Cells that break a rule turn red. **Hint** fixes a wrong cell first, else
   fills the selected (or a random) empty cell. **Undo** goes back one move.
+- **Sharing a puzzle.** Tap the line under the game's name (`Hard · 8×8 ·
+  No. 004211 ↗`) to share it, or copy it when sharing isn't offered. What
+  gets sent is the settings, the number and a link such as
+  `…/#tectonic/hard-8/4211` or `…/#sudoku/medium/52`, which opens that
+  puzzle. Whoever gets it can also choose the same level (and size) on the
+  game's page and type the number under **Puzzle number**.
 - The game in progress, your settings, solved counts and best times (without
   hints) are kept on the device.
 - Keyboard: digits, arrows, Backspace, `N` notes, `H` hint, `U` or Ctrl+Z undo.
