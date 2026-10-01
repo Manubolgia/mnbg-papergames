@@ -5,7 +5,7 @@
 // this app's prefix are ever cleared.
 
 const PREFIX = 'mnbg-papergames-';
-const VERSION = `${PREFIX}v3`;
+const VERSION = `${PREFIX}v4`;
 const SHELL = [
   './',
   './index.html',
@@ -29,7 +29,8 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(VERSION)
-      .then((cache) => Promise.allSettled(SHELL.map((url) => cache.add(url))))
+      // Past the browser's own cache, so a new version never stores old files.
+      .then((cache) => Promise.allSettled(SHELL.map((url) => cache.add(new Request(url, { cache: 'reload' })))))
       .then(() => self.skipWaiting()),
   );
 });

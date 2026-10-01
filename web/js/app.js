@@ -171,8 +171,12 @@ function makePuzzle(game, opts, seed) {
 
 // ---- routing ---------------------------------------------------------------
 
+let updateReady = false; // a new version has taken over
+
 function route() {
   const [game, sub, num] = location.hash.slice(1).split('/');
+  // A new version is waiting: load it now, unless a puzzle is on the board.
+  if (updateReady && sub !== 'play') return location.reload();
   stopClock();
   if (INFO[game] && sub === 'play') return showPlay(game);
   if (INFO[game] && sub && num) return openShared(game, sub, num);
@@ -884,8 +888,24 @@ document.addEventListener('click', (e) => {
 
 route();
 
+// The installed app is often resumed rather than opened, so it looks for a
+// new version each time it comes back, and loads one once it has taken over.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker
+      .register('./sw.js')
+      .then((reg) => {
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') reg.update().catch(() => {});
+        });
+      })
+      .catch(() => {});
+  });
+  let hadWorker = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    // The very first install has no older version to replace.
+    if (!hadWorker) return (hadWorker = true);
+    updateReady = true;
+    if (app.className !== 'play') location.reload();
   });
 }
