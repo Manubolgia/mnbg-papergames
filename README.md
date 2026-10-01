@@ -62,6 +62,9 @@ milliseconds.
   `…/#tectonic/hard-8/4211` or `…/#sudoku/medium/52`, which opens that
   puzzle. Whoever gets it can also choose the same level (and size) on the
   game's page and type the number under **Puzzle number**.
+- **English or Spanish.** The two flags on the home screen switch the
+  language. It starts in Spanish on a phone set to Spanish, and the choice
+  is remembered.
 - The game in progress, your settings, solved counts and best times (without
   hints) are kept on the device.
 - Keyboard: digits, arrows, Backspace, `N` notes, `H` hint, `U` or Ctrl+Z undo.

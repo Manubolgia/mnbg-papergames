@@ -3,7 +3,8 @@
 // Views: home (#), a game's page (#sudoku) and the board (#sudoku/play).
 // A link to one puzzle (#sudoku/hard/4211, #tectonic/easy-8/52) opens it.
 // Puzzles are made in a worker so the page never stalls; the game in
-// progress, settings and records live in localStorage.
+// progress, settings and records live in localStorage. English or Spanish,
+// picked with the flags on the home screen.
 
 import { GAMES } from './puzzles/index.js';
 
@@ -15,34 +16,154 @@ const inLibrary = window.parent !== window && window.name === 'mnbglibrary';
 const INFO = {
   tectonic: {
     name: 'Tectonic',
-    blurb: 'Regions of one to five cells. Touching cells never match.',
-    rules: [
-      'A region of N cells holds each number from 1 to N once.',
-      'Cells that touch, even at a corner, never hold the same number.',
-    ],
     defaults: { level: 'easy', size: 6 },
     keys: 5,
   },
   binairo: {
     name: 'Binairo',
-    blurb: 'Two kinds of square. No three in a row, every line balanced.',
-    rules: [
-      'Fill every cell with a full or an empty square. Tap a cell to cycle.',
-      'Never three of the same kind side by side, across or down.',
-      'Each row and column holds as many of one kind as the other.',
-      'No two rows are the same, and no two columns.',
-    ],
     defaults: { level: 'easy', size: 8 },
     keys: 2,
   },
   sudoku: {
     name: 'Sudoku',
-    blurb: 'Nine by nine. Every row, column and box holds 1 to 9.',
-    rules: ['Place 1 to 9 once in every row, every column and every 3 × 3 box.'],
     defaults: { level: 'medium' },
     keys: 9,
   },
 };
+
+// ---- words -----------------------------------------------------------------
+
+const TEXT = {
+  en: {
+    games: {
+      tectonic: {
+        blurb: 'Regions of one to five cells. Touching cells never match.',
+        rules: [
+          'A region of N cells holds each number from 1 to N once.',
+          'Cells that touch, even at a corner, never hold the same number.',
+        ],
+      },
+      binairo: {
+        blurb: 'Two kinds of square. No three in a row, every line balanced.',
+        rules: [
+          'Fill every cell with a full or an empty square. Tap a cell to cycle.',
+          'Never three of the same kind side by side, across or down.',
+          'Each row and column holds as many of one kind as the other.',
+          'No two rows are the same, and no two columns.',
+        ],
+      },
+      sudoku: {
+        blurb: 'Nine by nine. Every row, column and box holds 1 to 9.',
+        rules: ['Place 1 to 9 once in every row, every column and every 3 × 3 box.'],
+      },
+    },
+    levels: { easy: 'Easy', medium: 'Medium', hard: 'Hard' },
+    no: 'No.',
+    tagline: 'Every puzzle is made on the spot, and has exactly one solution you can reach without guessing.',
+    language: 'Language',
+    continue: 'Continue',
+    library: '← Back to the library',
+    install: 'Install',
+    back: 'Back',
+    level: 'Level',
+    size: 'Size',
+    newPuzzle: 'New puzzle',
+    puzzleNumber: 'Puzzle number',
+    open: 'Open',
+    numberNote: (sizes) => `Someone's number opens the same puzzle at the same level${sizes ? ' and size' : ''}.`,
+    solvedCount: 'Solved',
+    best: (setting) => `Best, ${setting}`,
+    numberRange: (max) => `A number from 1 to ${max}`,
+    badLink: 'That puzzle link is not right',
+    share: 'Share this puzzle',
+    inApp: (title) => `${title} in Paper Games`,
+    copied: 'Copied. Send it to a friend',
+    making: 'Making puzzle',
+    makeFailed: 'Could not make a puzzle',
+    solved: 'Solved',
+    hints: (n) => `${n} hint${n > 1 ? 's' : ''}`,
+    fullSquare: 'Full square',
+    emptySquare: 'Empty square',
+    undo: 'Undo',
+    notes: 'Notes',
+    erase: 'Erase',
+    hint: 'Hint',
+    restart: 'Restart',
+    sure: 'Sure?',
+    offSomewhere: 'Full, but something is off',
+    wasWrong: 'That one was wrong',
+    newBest: 'A new best time',
+  },
+  es: {
+    games: {
+      tectonic: {
+        blurb: 'Regiones de una a cinco casillas. Las casillas vecinas nunca coinciden.',
+        rules: [
+          'Una región de N casillas lleva cada número del 1 al N una vez.',
+          'Dos casillas que se tocan, aunque sea por una esquina, nunca llevan el mismo número.',
+        ],
+      },
+      binairo: {
+        blurb: 'Dos tipos de cuadrado. Nunca tres seguidos, cada línea equilibrada.',
+        rules: [
+          'Rellena cada casilla con un cuadrado lleno o vacío. Toca una casilla para cambiarla.',
+          'Nunca tres del mismo tipo seguidos, ni en horizontal ni en vertical.',
+          'Cada fila y cada columna lleva tantos de un tipo como del otro.',
+          'No hay dos filas iguales, ni dos columnas iguales.',
+        ],
+      },
+      sudoku: {
+        blurb: 'Nueve por nueve. Cada fila, columna y caja lleva del 1 al 9.',
+        rules: ['Coloca del 1 al 9 una vez en cada fila, cada columna y cada caja de 3 × 3.'],
+      },
+    },
+    levels: { easy: 'Fácil', medium: 'Medio', hard: 'Difícil' },
+    no: 'Nº',
+    tagline: 'Cada puzzle se crea al momento y tiene una sola solución, a la que se llega sin adivinar.',
+    language: 'Idioma',
+    continue: 'Continuar',
+    library: '← Volver a la biblioteca',
+    install: 'Instalar',
+    back: 'Atrás',
+    level: 'Nivel',
+    size: 'Tamaño',
+    newPuzzle: 'Nuevo puzzle',
+    puzzleNumber: 'Número de puzzle',
+    open: 'Abrir',
+    numberNote: (sizes) => `El número de otra persona abre el mismo puzzle con el mismo nivel${sizes ? ' y tamaño' : ''}.`,
+    solvedCount: 'Resueltos',
+    best: (setting) => `Mejor, ${setting}`,
+    numberRange: (max) => `Un número del 1 al ${max}`,
+    badLink: 'Ese enlace de puzzle no es correcto',
+    share: 'Compartir este puzzle',
+    inApp: (title) => `${title} en Paper Games`,
+    copied: 'Copiado. Envíaselo a alguien',
+    making: 'Creando puzzle',
+    makeFailed: 'No se pudo crear el puzzle',
+    solved: 'Resuelto',
+    hints: (n) => `${n} pista${n > 1 ? 's' : ''}`,
+    fullSquare: 'Cuadrado lleno',
+    emptySquare: 'Cuadrado vacío',
+    undo: 'Deshacer',
+    notes: 'Notas',
+    erase: 'Borrar',
+    hint: 'Pista',
+    restart: 'Reiniciar',
+    sure: '¿Seguro?',
+    offSomewhere: 'Completo, pero algo no cuadra',
+    wasWrong: 'Esa estaba mal',
+    newBest: 'Nuevo mejor tiempo',
+  },
+};
+
+// Little flags for the language switch.
+const FLAGS = {
+  en: `<svg viewBox="0 0 60 40" preserveAspectRatio="none" aria-hidden="true"><path fill="#012169" d="M0 0h60v40H0z"/>
+    <path d="M0 0l60 40M60 0L0 40" stroke="#fff" stroke-width="8"/><path d="M0 0l60 40M60 0L0 40" stroke="#c8102e" stroke-width="3"/>
+    <path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="12"/><path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="7"/></svg>`,
+  es: `<svg viewBox="0 0 60 40" aria-hidden="true"><path fill="#aa151b" d="M0 0h60v40H0z"/><path fill="#f1bf00" d="M0 10h60v20H0z"/></svg>`,
+};
+const LANG_NAMES = { en: 'English', es: 'Español' };
 
 // ---- storage ---------------------------------------------------------------
 
@@ -62,6 +183,22 @@ function persist() {
   } catch {}
 }
 
+let lang = TEXT[store.lang] ? store.lang : /^es\b/i.test(navigator.language || '') ? 'es' : 'en';
+document.documentElement.lang = lang;
+
+function t(key, ...args) {
+  const v = TEXT[lang][key] ?? TEXT.en[key];
+  return typeof v === 'function' ? v(...args) : v;
+}
+
+function setLang(next) {
+  if (!TEXT[next] || next === lang) return;
+  lang = store.lang = next;
+  document.documentElement.lang = lang;
+  persist();
+  route();
+}
+
 const prefs = (game) => ({ ...INFO[game].defaults, ...(store.prefs[game] || {}) });
 
 // ---- helpers ---------------------------------------------------------------
@@ -77,14 +214,15 @@ function clock(sec) {
 }
 
 const settingKey = (level, size) => (size ? `${level}-${size}` : level);
-const settingName = (level, size) => (size ? `${cap(level)} · ${size}×${size}` : cap(level));
-const number = (seed) => `No. ${String(seed).padStart(6, '0')}`;
+const levelName = (level) => TEXT[lang].levels[level] || cap(level);
+const settingName = (level, size) => (size ? `${levelName(level)} · ${size}×${size}` : levelName(level));
+const number = (seed) => `${t('no')} ${String(seed).padStart(6, '0')}`;
 
 const MAX_SEED = 999999;
 
 // The number typed in, or null if it isn't one.
 function parseSeed(text) {
-  const digits = String(text).replace(/^\s*(no\.?)?\s*/i, '').trim();
+  const digits = String(text).replace(/^\s*(no\.?|n\.?º)?\s*/i, '').trim();
   if (!/^\d{1,6}$/.test(digits)) return null;
   const n = Number(digits);
   return n >= 1 && n <= MAX_SEED ? n : null;
@@ -200,23 +338,26 @@ function showHome() {
   const rows = Object.keys(INFO)
     .map((game) => {
       const s = store.saves[game];
-      const resume = s && !s.done ? `<span class="resume">Continue ${number(s.seed)} · ${settingName(s.level, s.size)} · ${clock(s.time)}</span>` : '';
+      const resume = s && !s.done ? `<span class="resume">${t('continue')} ${number(s.seed)} · ${settingName(s.level, s.size)} · ${clock(s.time)}</span>` : '';
       return `<li><a href="#${game}">
         ${ICONS[game]}
-        <span><span class="name">${INFO[game].name}</span><span class="blurb">${INFO[game].blurb}</span>${resume}</span>
+        <span><span class="name">${INFO[game].name}</span><span class="blurb">${TEXT[lang].games[game].blurb}</span>${resume}</span>
         <span class="go" aria-hidden="true">→</span>
         </a></li>`;
     })
     .join('');
   app.innerHTML = `
     <header class="masthead">
+      <div class="langs" role="group" aria-label="${t('language')}">${Object.keys(TEXT)
+        .map((l) => `<button type="button" data-lang="${l}" lang="${l}" aria-pressed="${l === lang}" aria-label="${LANG_NAMES[l]}" title="${LANG_NAMES[l]}">${FLAGS[l]}</button>`)
+        .join('')}</div>
       <h1>Paper<br>Games</h1>
-      <p>Every puzzle is made on the spot, and has exactly one solution you can reach without guessing.</p>
+      <p>${t('tagline')}</p>
     </header>
     <ol class="games">${rows}</ol>
     <footer class="foot">
-      ${inLibrary ? '<button class="btn" id="library">← Back to the library</button>' : ''}
-      <button class="btn" id="install" hidden>Install</button>
+      ${inLibrary ? `<button class="btn" id="library">${t('library')}</button>` : ''}
+      <button class="btn" id="install" hidden>${t('install')}</button>
     </footer>`;
   app.querySelectorAll('.games a').forEach((a) =>
     a.addEventListener('click', (e) => {
@@ -224,6 +365,7 @@ function showHome() {
       go(a.getAttribute('href'));
     }),
   );
+  app.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
   const install = $('#install');
   if (installPrompt && !inLibrary) {
     install.hidden = false;
@@ -256,34 +398,34 @@ function showSetup(game) {
 
   const seg = (name, options, current, label) =>
     `<div class="field"><span class="label">${label}</span><div class="seg" data-name="${name}">${options
-      .map((o) => `<button type="button" data-value="${o}" aria-pressed="${o === current}">${name === 'size' ? `${o}×${o}` : o}</button>`)
+      .map((o) => `<button type="button" data-value="${o}" aria-pressed="${o === current}">${name === 'size' ? `${o}×${o}` : levelName(o)}</button>`)
       .join('')}</div></div>`;
 
   const best = stats.best[settingKey(p.level, def.sizes ? p.size : null)];
   app.innerHTML = `
     <header class="bar">
-      <a class="back" href="#" aria-label="Back">←</a>
+      <a class="back" href="#" aria-label="${t('back')}">←</a>
       <h2>${info.name}</h2>
       <span></span>
     </header>
-    <ol class="rules">${info.rules.map((r) => `<li>${esc(r)}</li>`).join('')}</ol>
-    ${seg('level', def.levels, p.level, 'Level')}
-    ${def.sizes ? seg('size', def.sizes, p.size, 'Size') : ''}
+    <ol class="rules">${TEXT[lang].games[game].rules.map((r) => `<li>${esc(r)}</li>`).join('')}</ol>
+    ${seg('level', def.levels, p.level, t('level'))}
+    ${def.sizes ? seg('size', def.sizes, p.size, t('size')) : ''}
     <div class="actions-col">
-      <button class="btn primary wide" id="new">New puzzle</button>
-      ${save && !save.done ? `<button class="btn wide" id="continue">Continue<small>${number(save.seed)} · ${settingName(save.level, save.size)} · ${clock(save.time)}</small></button>` : ''}
+      <button class="btn primary wide" id="new">${t('newPuzzle')}</button>
+      ${save && !save.done ? `<button class="btn wide" id="continue">${t('continue')}<small>${number(save.seed)} · ${settingName(save.level, save.size)} · ${clock(save.time)}</small></button>` : ''}
     </div>
     <form class="field number" id="by-number" novalidate>
-      <label class="label" for="seed">Puzzle number</label>
+      <label class="label" for="seed">${t('puzzleNumber')}</label>
       <div class="entry">
         <input id="seed" inputmode="numeric" autocomplete="off" enterkeyhint="go" placeholder="000000" />
-        <button class="btn" type="submit">Open</button>
+        <button class="btn" type="submit">${t('open')}</button>
       </div>
-      <p class="note">Someone's number opens the same puzzle at the same level${def.sizes ? ' and size' : ''}.</p>
+      <p class="note">${t('numberNote', !!def.sizes)}</p>
     </form>
     <dl class="stats">
-      <dt>Solved</dt><dd>${stats.solved}</dd>
-      <dt>Best, ${settingName(p.level, def.sizes ? p.size : null).toLowerCase()}</dt><dd>${best ? clock(best) : '—'}</dd>
+      <dt>${t('solvedCount')}</dt><dd>${stats.solved}</dd>
+      <dt>${t('best', settingName(p.level, def.sizes ? p.size : null).toLowerCase())}</dt><dd>${best ? clock(best) : '—'}</dd>
     </dl>`;
 
   $('.back').addEventListener('click', (e) => {
@@ -306,7 +448,7 @@ function showSetup(game) {
     e.preventDefault();
     const seed = parseSeed($('#seed').value);
     if (!seed) {
-      toast(`A number from 1 to ${MAX_SEED}`);
+      toast(t('numberRange', MAX_SEED));
       return $('#seed').focus();
     }
     const now = prefs(game);
@@ -339,7 +481,7 @@ function openShared(game, setting, num) {
   const size = def.sizes ? Number(sizeText) : null;
   const seed = parseSeed(num);
   if (!def.levels.includes(level) || (def.sizes && !def.sizes.includes(size)) || !seed) {
-    toast('That puzzle link is not right');
+    toast(t('badLink'));
     return go(`#${game}`, true);
   }
   openNumber(game, level, size, seed, true);
@@ -353,7 +495,7 @@ async function share() {
   // Outside pages can't be linked into the library's frame, so the link
   // points at the app on its own; the number works anywhere.
   const url = location.href.split('#')[0] + shareHash(S);
-  const text = `${title} in Paper Games`;
+  const text = t('inApp', title);
   try {
     if (navigator.share && !inLibrary) return await navigator.share({ title, text, url });
   } catch (err) {
@@ -361,7 +503,7 @@ async function share() {
   }
   try {
     await navigator.clipboard.writeText(`${text}\n${url}`);
-    toast('Copied. Send it to a friend');
+    toast(t('copied'));
   } catch {
     toast(title);
   }
@@ -444,11 +586,11 @@ async function showPlay(game) {
 
   app.innerHTML = `
     <header class="bar">
-      <a class="back" href="#${game}" aria-label="Back">←</a>
-      <div><h2>${info.name}</h2><button type="button" class="sub share" aria-label="Share this puzzle">${settingName(saved.level, saved.size)} · ${number(saved.seed)} <span aria-hidden="true">↗</span></button></div>
+      <a class="back" href="#${game}" aria-label="${t('back')}">←</a>
+      <div><h2>${info.name}</h2><button type="button" class="sub share" aria-label="${t('share')}">${settingName(saved.level, saved.size)} · ${number(saved.seed)} <span aria-hidden="true">↗</span></button></div>
       <span class="timer">00:00</span>
     </header>
-    <div class="stage"><div class="board wait"><span class="making">Making puzzle</span></div></div>
+    <div class="stage"><div class="board wait"><span class="making">${t('making')}</span></div></div>
     <div class="controls"></div>`;
   $('.back').addEventListener('click', (e) => {
     e.preventDefault();
@@ -472,7 +614,7 @@ async function showPlay(game) {
         history: [],
       };
     } catch (err) {
-      toast('Could not make a puzzle');
+      toast(t('makeFailed'));
       console.error(err);
       delete store.saves[game];
       persist();
@@ -533,11 +675,11 @@ function buildControls() {
   if (S.done) {
     box.innerHTML = `
       <div class="solved">
-        <h3>Solved</h3>
-        <p>${clock(S.time)}${S.hints ? ` · ${S.hints} hint${S.hints > 1 ? 's' : ''}` : ''} · ${settingName(S.level, S.size)} · ${number(S.seed)}</p>
+        <h3>${t('solved')}</h3>
+        <p>${clock(S.time)}${S.hints ? ` · ${t('hints', S.hints)}` : ''} · ${settingName(S.level, S.size)} · ${number(S.seed)}</p>
         <div class="row">
           <button class="btn" id="menu">${info.name}</button>
-          <button class="btn primary" id="again">New puzzle</button>
+          <button class="btn primary" id="again">${t('newPuzzle')}</button>
         </div>
       </div>`;
     $('#menu').addEventListener('click', () => go(`#${S.game}`, true));
@@ -549,19 +691,19 @@ function buildControls() {
   }
   const keys =
     S.game === 'binairo'
-      ? [1, 0].map((v) => `<button type="button" data-v="${v}" aria-label="${v ? 'Full square' : 'Empty square'}"><span class="sq ${v ? 'one' : 'zero'}"></span></button>`)
+      ? [1, 0].map((v) => `<button type="button" data-v="${v}" aria-label="${t(v ? 'fullSquare' : 'emptySquare')}"><span class="sq ${v ? 'one' : 'zero'}"></span></button>`)
       : Array.from({ length: info.keys }, (_, k) => `<button type="button" data-v="${k + 1}">${k + 1}</button>`);
   const tools = [
-    ['undo', 'Undo'],
-    ...(S.game === 'binairo' ? [] : [['notes', 'Notes']]),
-    ['erase', 'Erase'],
-    ['hint', 'Hint'],
-    ['restart', 'Restart'],
+    'undo',
+    ...(S.game === 'binairo' ? [] : ['notes']),
+    'erase',
+    'hint',
+    'restart',
   ];
   box.innerHTML = `
     <div class="pad" style="--keys:${keys.length}">${keys.join('')}</div>
     <div class="tools" style="--tools:${tools.length}">${tools
-      .map(([id, label]) => `<button type="button" data-tool="${id}">${label}</button>`)
+      .map((id) => `<button type="button" data-tool="${id}">${t(id)}</button>`)
       .join('')}</div>`;
   $('.pad').addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -740,7 +882,7 @@ function after() {
   save();
   if (!S.values.includes(-1)) {
     if (S.values.every((v, i) => v === S.solution[i])) solved();
-    else toast('Full, but something is off');
+    else toast(t('offSomewhere'));
   }
 }
 
@@ -785,19 +927,19 @@ function tool(id, button) {
     if (confirmKey !== 'restart') {
       confirmKey = 'restart';
       button.classList.add('confirm');
-      button.textContent = 'Sure?';
+      button.textContent = t('sure');
       clearTimeout(confirmTimer);
       confirmTimer = setTimeout(() => {
         confirmKey = null;
         button.classList.remove('confirm');
-        button.textContent = 'Restart';
+        button.textContent = t('restart');
       }, 2500);
       return;
     }
     confirmKey = null;
     clearTimeout(confirmTimer);
     button.classList.remove('confirm');
-    button.textContent = 'Restart';
+    button.textContent = t('restart');
     S.values = S.givens.slice();
     S.notes = S.givens.map(() => 0);
     S.history = [];
@@ -819,7 +961,7 @@ function hint() {
   sel = i;
   S.hints++;
   if (!S.hinted.includes(i)) S.hinted.push(i);
-  if (wrong.length) toast('That one was wrong');
+  if (wrong.length) toast(t('wasWrong'));
   change([[i, S.solution[i], 0]]);
 }
 
@@ -837,7 +979,7 @@ function solved() {
   save();
   paint();
   buildControls();
-  if (record) toast('A new best time');
+  if (record) toast(t('newBest'));
 }
 
 document.addEventListener('keydown', (e) => {

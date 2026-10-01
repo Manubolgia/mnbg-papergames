@@ -110,8 +110,38 @@ a {
 /* ---- home ------------------------------------------------------------- */
 
 .masthead {
+  position: relative;
   padding: 28px 0 20px;
   border-bottom: var(--thick) solid var(--ink);
+}
+
+/* The language switch: two small flags, the one in use outlined. */
+.langs {
+  position: absolute;
+  top: 0;
+  right: -8px;
+  display: flex;
+}
+
+.langs button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+
+.langs svg {
+  display: block;
+  width: 24px;
+  height: 16px;
+  outline: 1px solid var(--line);
+  opacity: 0.45;
+}
+
+.langs button[aria-pressed='true'] svg {
+  outline: var(--thick) solid var(--ink);
+  outline-offset: 2px;
+  opacity: 1;
 }
 
 .masthead h1 {
@@ -590,6 +620,20 @@ a {
   text-transform: uppercase;
 }
 
+/* Spanish labels run longer (Deshacer, Reiniciar), and so does any label
+   on the narrowest phones. */
+:lang(es) .tools button {
+  font-size: min(12px, 2.8vw);
+  letter-spacing: 0;
+}
+
+@media (max-width: 340px) {
+  .tools button {
+    font-size: min(12px, 3vw);
+    letter-spacing: 0;
+  }
+}
+
 .tools button:active:not(:disabled),
 .tools button[aria-pressed='true'] {
   background: var(--ink);
@@ -669,7 +713,7 @@ a {
 
 @media (max-width: 370px) {
   .tools button {
-    font-size: 11px;
+    font-size: min(12px, 3vw);
     letter-spacing: 0.02em;
   }
 }
